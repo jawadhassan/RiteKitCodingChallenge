@@ -1,7 +1,5 @@
 package com.example.hamid_pc.ritekitcodingchallenge;
 
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,29 +11,38 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.GsonBuilder;
+
 import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainFragment extends Fragment {
+
+public class InfluenceListFragment extends Fragment {
 
 
     private static final String API_KEY = BuildConfig.API_KEY;
-    private final String TAG = "MainActivity";
+    private static final String ARG_HASH = "hash_tag";
+    private final String TAG = "InflunencerListActivity";
     private RecyclerView mRecyclerView;
-    private HashTagAdapter mHashTagAdapter;
-    private SOService mSOService;
+    private InfluencerAdapter mInfluencerAdapter;
+    private SOService mInfluencerService;
     private SOService mAuthSOService;
+    private String mHashTag;
 
-    public static MainFragment newInstance() {
-        MainFragment fragment = new MainFragment();
+    public static InfluenceListFragment newInstance(String hashTag) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_HASH, hashTag);
+        InfluenceListFragment fragment = new InfluenceListFragment();
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        mHashTag = (String) getArguments().getSerializable(ARG_HASH);
         super.onCreate(savedInstanceState);
     }
 
@@ -43,60 +50,64 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment, container, false);
-        mAuthSOService = ApiUtils.getAuthenticate();
-        mSOService = ApiUtils.getSOService();
-
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mHashTagAdapter = new HashTagAdapter(getActivity(), new ArrayList<Tag>(0), new HashTagAdapter.TagItemListener() {
+        mAuthSOService = ApiUtils.getAuthenticate();
+        mInfluencerService = ApiUtils.getSOService();
+
+        mInfluencerAdapter = new InfluencerAdapter(getActivity(), new ArrayList<Influencer>(0), new InfluencerAdapter.InfluencerItemListener() {
             @Override
-            public void onPostClick(String tag) {
-                Log.d(TAG, "check" + tag);
-                Intent intent = InfluencerListActivity.start(getActivity(), tag);
-                startActivity(intent);
+            public void onPostClick(String username) {
+
             }
         });
-
-        mRecyclerView.setAdapter(mHashTagAdapter);
+        mRecyclerView.setAdapter(mInfluencerAdapter);
         mRecyclerView.setHasFixedSize(true);
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
         mRecyclerView.addItemDecoration(itemDecoration);
+        loadInfluencers();
 
-
-        loadTrends();
         return view;
     }
 
-    public void loadTrends() {
+    public void loadInfluencers() {
 
-        mAuthSOService.getAuthenticate(API_KEY);
-
-        mSOService.getTrends(1, 1).enqueue(new Callback<TrendingHashResponse>() {
+        mAuthSOService.getAuthenticate(API_KEY).enqueue(new Callback<TrendingHashResponse>() {
             @Override
             public void onResponse(Call<TrendingHashResponse> call, Response<TrendingHashResponse> response) {
+                call.request().url().toString();
+            }
 
+            @Override
+            public void onFailure(Call<TrendingHashResponse> call, Throwable t) {
+
+            }
+        });
+
+        mInfluencerService.getInfluencers(mHashTag).enqueue(new Callback<InfluencerResponse>() {
+            @Override
+            public void onResponse(Call<InfluencerResponse> call, Response<InfluencerResponse> response) {
 
 
                 if (response.isSuccessful()) {
-                    mHashTagAdapter.updateHashTag(response.body().getTags());
-                    //                  Log.w("2.0 getFeed ", new GsonBuilder().setPrettyPrinting().create().toJson(response));
+                    mInfluencerAdapter.updateHashTag(response.body().getInfluencers());
+                    Log.w("2.0 getFeed ", new GsonBuilder().setPrettyPrinting().create().toJson(response));
 
                 } else {
                     int statusCode = response.code();
                     Log.d(TAG, "" + statusCode);
 
-
+                    Log.d("Check", call.request().url().toString());
                     // handle request errors depending on status code
                 }
             }
 
             @Override
-            public void onFailure(Call<TrendingHashResponse> call, Throwable t) {
+            public void onFailure(Call<InfluencerResponse> call, Throwable t) {
 //                Log.d("Check", call.request().url().toString());
                 Log.d(TAG, "error loading from API" + t.getMessage());
 
             }
         });
     }
-
 }

@@ -18,5 +18,4 @@ public class ApiUtils {
         return RetrofitClient.getClient(BASE_URL).create(SOService.class);
     }
 
-
 }

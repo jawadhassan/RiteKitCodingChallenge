@@ -1,6 +1,5 @@
 package com.example.hamid_pc.ritekitcodingchallenge;
 
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,20 +10,20 @@ import android.widget.TextView;
 import java.util.List;
 
 
-public class HashTagAdapter extends RecyclerView.Adapter<HashTagAdapter.ViewHolder> {
-
-    private List<Tag> mTags;
+public class InfluencerAdapter extends RecyclerView.Adapter<InfluencerAdapter.ViewHolder> {
+    private List<Influencer> mInfluencers;
     private Context mContext;
-    private TagItemListener mItemListener;
+    private InfluencerItemListener mItemListener;
 
-    public HashTagAdapter(Context context, List<Tag> tags, TagItemListener itemListener) {
-        mTags = tags;
+    public InfluencerAdapter(Context context, List<Influencer> influencers, InfluencerItemListener itemListener) {
+        mInfluencers = influencers;
         mContext = context;
         mItemListener = itemListener;
     }
 
+
     @Override
-    public HashTagAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -36,50 +35,51 @@ public class HashTagAdapter extends RecyclerView.Adapter<HashTagAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(HashTagAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
 
-        Tag tag = mTags.get(position);
+        Influencer influencer = mInfluencers.get(position);
         TextView textView = holder.mTitleTagName;
-        textView.setText(tag.getTag());
+        textView.setText(influencer.getUsername());
     }
 
     @Override
     public int getItemCount() {
-        return mTags.size();
+        return mInfluencers.size();
     }
 
-    public void updateHashTag(List<Tag> tags) {
-        mTags = tags;
+    public void updateHashTag(List<Influencer> influencers) {
+        mInfluencers = influencers;
         notifyDataSetChanged();
     }
 
-    private Tag getItem(int adapterPosition) {
-        return mTags.get(adapterPosition);
+    private Influencer getItem(int adapterPosition) {
+        return mInfluencers.get(adapterPosition);
     }
 
-    public interface TagItemListener {
-        void onPostClick(String tag);
+    public interface InfluencerItemListener {
+        void onPostClick(String username);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView mTitleTagName;
         public TextView mTitleTagExposure;
-        TagItemListener mItemListener;
+        InfluencerItemListener mItemListener;
 
-        public ViewHolder(View itemView, TagItemListener tagItemListener) {
+        public ViewHolder(View itemView, InfluencerItemListener influencerItemListener) {
             super(itemView);
             mTitleTagName = (TextView) itemView.findViewById(R.id.text_view_tag_name);
 
-            this.mItemListener = tagItemListener;
+            this.mItemListener = influencerItemListener;
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            Tag tag = getItem(getAdapterPosition());
-            this.mItemListener.onPostClick(tag.getTag());
+            Influencer influencer = getItem(getAdapterPosition());
+            this.mItemListener.onPostClick(influencer.getUsername());
             notifyDataSetChanged();
         }
     }
+
 }
