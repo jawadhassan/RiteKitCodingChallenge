@@ -12,27 +12,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.gson.GsonBuilder;
-
 import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class MainFragment extends Fragment {
 
 
-    private static Retrofit mRetrofit;
+    private static final String API_KEY = BuildConfig.API_KEY;
     private final String TAG = getClass().getSimpleName();
-    String API_KEY = "9fc671f51275e0363e866bcc7ab93fa25ce010afe693";
     private RecyclerView mRecyclerView;
     private HashTagAdapter mHashTagAdapter;
     private SOService mSOService;
 
 
-    //Assign Api Key
+
     private SOService mAutSOService;
 
     public static MainFragment newInstance() {
@@ -57,7 +53,7 @@ public class MainFragment extends Fragment {
         mHashTagAdapter = new HashTagAdapter(getActivity(), new ArrayList<Tag>(0), new HashTagAdapter.TagItemListener() {
             @Override
             public void onPostClick(long id) {
-                Log.d("check", "check");
+                Log.d(TAG, "check");
             }
         });
 
@@ -80,14 +76,14 @@ public class MainFragment extends Fragment {
             public void onResponse(Call<TrendingHashResponse> call, Response<TrendingHashResponse> response) {
 
 
-                Log.d("Check", call.request().url().toString());
+
                 if (response.isSuccessful()) {
                     mHashTagAdapter.updateHashTag(response.body().getTags());
-                    Log.w("2.0 getFeed ", new GsonBuilder().setPrettyPrinting().create().toJson(response));
-                    Log.d("MainActivity", "posts loaded from API");
+                    //                  Log.w("2.0 getFeed ", new GsonBuilder().setPrettyPrinting().create().toJson(response));
+
                 } else {
                     int statusCode = response.code();
-                    Log.d("Check", "" + statusCode);
+                    Log.d(TAG, "" + statusCode);
 
 
                     // handle request errors depending on status code
@@ -96,8 +92,8 @@ public class MainFragment extends Fragment {
 
             @Override
             public void onFailure(Call<TrendingHashResponse> call, Throwable t) {
-                Log.d("Check", call.request().url().toString());
-                Log.d("MainActivity", "error loading from API" + t.getMessage());
+//                Log.d("Check", call.request().url().toString());
+                Log.d(TAG, "error loading from API" + t.getMessage());
 
             }
         });
