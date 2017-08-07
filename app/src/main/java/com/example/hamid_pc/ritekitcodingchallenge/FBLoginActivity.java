@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -32,7 +31,7 @@ public class FBLoginActivity extends AppCompatActivity {
         mLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Toast.makeText(getApplicationContext(), getString(R.string.fb_login_toast_success), Toast.LENGTH_LONG).show();
+                // Toast.makeText(getApplicationContext(), getString(R.string.fb_login_toast_success), Toast.LENGTH_LONG).show();
                 Intent intent = MainActivity.newIntent(FBLoginActivity.this);
                 startActivity(intent);
 
@@ -60,19 +59,6 @@ public class FBLoginActivity extends AppCompatActivity {
 //        printKeyHash(this);
 
 
-    protected void onResume() {
-        super.onResume();
-        // Logs 'install' and 'app activate' App Events.
-        AppEventsLogger.activateApp(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // Logs 'app deactivate' App Event.
-        AppEventsLogger.deactivateApp(this);
-
-    }
 
     //
 //    public static String printKeyHash(Activity context) {
